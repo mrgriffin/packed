@@ -119,10 +119,36 @@ template<uint64_t I, uint64_t J=0>
 struct range {
     // HINT: Swap I and J to have range<N> == range<0, N>.
     static constexpr auto values = (I < J ? J - I : I - J);
+    using underlying_type = detail::of_size_t<values>;
 
     constexpr range(uint64_t v) : value(v) {}
-    constexpr operator detail::of_size_t<values>() const noexcept { return value; }
-    detail::of_size_t<values> value;
+    constexpr operator underlying_type() const noexcept { return value; }
+    underlying_type value;
+};
+
+// TODO: Specialize for the common case of Vs being a contiguous range.
+template<typename T, T... Vs>
+class enum_ {
+public:
+    static constexpr auto values = sizeof...(Vs);
+    using underlying_type = detail::of_size_t<values>;
+
+    constexpr enum_(T v) : index(indexof(v)) {}
+    constexpr operator T() const noexcept { return (T[]){Vs...}[index]; }
+    constexpr operator underlying_type() const noexcept { return index; }
+
+// HINT: Used for tests.
+//private:
+    underlying_type index;
+
+private:
+    constexpr auto indexof(T v) {
+        constexpr T vs[] = { Vs... };
+        for (underlying_type i = 0; i < values; ++i) {
+            if (vs[i] == v) return i;
+        }
+        // TODO: Throw an exception in non-constexpr contexts.
+    }
 };
 
 template<typename... NTs>

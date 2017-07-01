@@ -78,6 +78,15 @@ constexpr bool test_struct_representations_distinct() {
 }
 static_assert(test_struct_representations_distinct());
 
+enum class E { a, b, c };
+using Ep = packed::enum_<E, E::a, E::b, E::c>;
+
+static_assert(Ep(E::a).index == 0);
+static_assert(Ep(E::c).index == 2);
+
+using Es = packed::struct_<tag, Ep>;
+static_assert(Es::make(E::b).value == 1);
+
 #include <cstdio>
 #include <utility>
 std::pair<T2, T2> mkpair(int i, int j) {
