@@ -114,6 +114,7 @@ struct product_size<_, T, _Ts...> {
 
 }
 
+// TODO: Surely int64_t is more appropriate?
 template<uint64_t I, uint64_t J=0>
 struct range {
     // HINT: Swap I and J to have range<N> == range<0, N>.
@@ -175,5 +176,11 @@ private:
         return a * T::values + underlying_type(t);
     }
 };
+
+// TODO: std::array-like.
+// TODO: Support (ab)using spare bits in pointers with struct_<T*, U>?
+//       alignof tells us how many bits are required. Note this requires
+//       us to transform compacted values (i.e. shift), but that would
+//       be needed for correct enum support anyway.
 
 }
